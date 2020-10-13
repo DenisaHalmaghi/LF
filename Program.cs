@@ -38,7 +38,7 @@ namespace First_App
                 string key = output[i].ToString();
                 if (productii.TryGetValue(key, out values))
                 {
-                    value = getRandomValue(values, values.Length);
+                    value = getRandomValue(values);
                     output = output.Replace(key, value, i, 1);
                     i--;
                 }
@@ -55,9 +55,9 @@ namespace First_App
 
         }
 
-        static string getRandomValue(string[] array, int length)
+        static string getRandomValue(string[] array)
         {
-            return array[rand.Next(0, length)];
+            return array[rand.Next(0, array.Length)];
         }
 
         static void setup()
@@ -105,8 +105,6 @@ namespace First_App
             }
 
             //verificam daca toate caracterele sunt fie terminale fie neterminale
-            //merge neterminale+terminale 
-            //^[{merged}]+$
             string merged = $"^[{string.Join("", terminale.ToArray())}{string.Join("", neterminale.ToArray())}]+$";
 
             foreach (string value in values)
