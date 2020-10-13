@@ -62,9 +62,9 @@ namespace First_App
 
         static void setup()
         {
-            StreamReader sr = new StreamReader(System.IO.Path.GetFullPath(@"..\..\..\") + "setup.txt");
-            string contents = sr.ReadToEnd();
-           
+            StreamReader sr = new StreamReader(Path.GetFullPath(@"..\..\..\") + "setup.txt");
+            string contents = Regex.Replace(sr.ReadToEnd()," ","");
+            Console.WriteLine(contents);
             MatchCollection matches = getParts(contents,"T");
             foreach (Match match in matches)
             {
@@ -87,7 +87,7 @@ namespace First_App
 
         static MatchCollection getParts(string contents,string part)
         {
-            string value = Regex.Match(contents, part + @"=\{(?<word>.+)}").Groups["word"].Value;
+            string value = Regex.Match(contents, part + @"=\{(?<word>.+)},").Groups["word"].Value;
 
             return Regex.Matches(value, @"(?:(?<=\()[^()\s]+(?=\)))|(?:(?<!\()[^()\s,]+(?!\)))");
         }
@@ -117,7 +117,6 @@ namespace First_App
             }
 
             productii.Add(key,values);
-            
         }
 
     }
