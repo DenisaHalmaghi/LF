@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace First_App
 {
@@ -12,7 +13,7 @@ namespace First_App
         static List<string> neterminale = new List<string>();
         static List<string> terminale = new List<string>();
         static Dictionary<string, string[]> productii = new Dictionary<string, string[]>();
-
+        static string start ="";
         static void Main(string[] args)
         {
 
@@ -20,10 +21,7 @@ namespace First_App
             setup();
             //Map all productions to keys
 
-            //Starting string
-            /*string S = "E";
-
-            StringBuilder output = new StringBuilder(S); //Start with the starting string
+            StringBuilder output = new StringBuilder(start); //Start with the starting string
 
             string[] values = { };
             string value = "";
@@ -39,19 +37,21 @@ namespace First_App
                 if (productii.TryGetValue(key, out values))
                 {
                     value = getRandomValue(values);
+                   
+                    if (output.Length +value.Length-1> 60) //check case in which replacement length >1
+                    {
+                        break;
+                    }
                     output = output.Replace(key, value, i, 1);
                     i--;
+                    Console.WriteLine(output);
                 }
 
             }
 
             Console.WriteLine(output);
-            Console.WriteLine(output.Length);*/
+            Console.WriteLine(output.Length);
 
-            //keep iterating over each symbol
-
-            //when you find a non terminal replace it
-            //go back 1 position
 
         }
 
@@ -64,7 +64,7 @@ namespace First_App
         {
             StreamReader sr = new StreamReader(Path.GetFullPath(@"..\..\..\") + "setup.txt");
             string contents = Regex.Replace(sr.ReadToEnd()," ","");
-            Console.WriteLine(contents);
+          //  Console.WriteLine(contents);
             MatchCollection matches = getParts(contents,"T");
             foreach (Match match in matches)
             {
@@ -77,11 +77,15 @@ namespace First_App
                 neterminale.Add(match.ToString());
             }
 
-            matches = getParts(contents, "P");
-            foreach (Match match in matches)
+            string [] productions = getProductions(contents, "P");
+            foreach (string production in productions)
             {
-                mapToProductions(match.ToString());
+                mapToProductions(production);
             }
+
+            start = Regex.Match(contents, @"S=(?<word>.+),?").Groups["word"].Value;
+
+            Console.WriteLine("Rezultatul este:");
            
         }
 
@@ -91,6 +95,17 @@ namespace First_App
 
             return Regex.Matches(value, @"(?:(?<=\()[^()\s]+(?=\)))|(?:(?<!\()[^()\s,]+(?!\)))");
         }
+
+        static string[] getProductions(string contents, string part)
+        {
+            string value = Regex.Match(contents, part + @"=\{(?<word>.+)},").Groups["word"].Value;
+            return Regex.Split(value, @"(?<!\(),(?!\))");
+        }
+
+        //(?<!\()[^\s,]+(?!\))
+        //get al "special commas"
+        //(?<=\(),(?=\))
+        // ((?<!\()[^\s,]+(?!\)))|((?<=\()[^\s]+(?<=\)))
 
         static void mapToProductions(string production)
         {
@@ -105,7 +120,7 @@ namespace First_App
             }
 
             //verificam daca toate caracterele sunt fie terminale fie neterminale
-            string merged = $"^[{string.Join("", terminale.ToArray())}{string.Join("", neterminale.ToArray())}]+$";
+            string merged = $"^\\(?[{string.Join("", terminale.ToArray())}{string.Join("", neterminale.ToArray())}]+\\)?$";
 
             foreach (string value in values)
             {
