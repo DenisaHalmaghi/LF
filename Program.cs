@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 
 namespace First_App
 {
@@ -21,12 +20,11 @@ namespace First_App
             setup();
             //Map all productions to keys
 
-            StringBuilder output = new StringBuilder(start); //Start with the starting string
+            StringBuilder output = new StringBuilder(start); 
 
             string[] values = { };
             string value = "";
             productii.TryGetValue("E", out values);
-            // Console.WriteLine(value[0]);
 
             //Derivare extrem stanga 
 
@@ -64,7 +62,7 @@ namespace First_App
         {
             StreamReader sr = new StreamReader(Path.GetFullPath(@"..\..\..\") + "setup.txt");
             string contents = Regex.Replace(sr.ReadToEnd()," ","");
-          //  Console.WriteLine(contents);
+
             MatchCollection matches = getParts(contents,"T");
             foreach (Match match in matches)
             {
@@ -101,11 +99,6 @@ namespace First_App
             string value = Regex.Match(contents, part + @"=\{(?<word>.+)},").Groups["word"].Value;
             return Regex.Split(value, @"(?<!\(),(?!\))");
         }
-
-        //(?<!\()[^\s,]+(?!\))
-        //get al "special commas"
-        //(?<=\(),(?=\))
-        // ((?<!\()[^\s,]+(?!\)))|((?<=\()[^\s]+(?<=\)))
 
         static void mapToProductions(string production)
         {
