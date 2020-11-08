@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -9,61 +10,119 @@ namespace First_App
     class Program
     {
         static Random rand = new Random();
-        static List<string> neterminale = new List<string>();
-        static List<string> terminale = new List<string>();
-        static Dictionary<string, string[]> productii = new Dictionary<string, string[]>();
-        static string start ="";
+        public static List<string> neterminale = new List<string>();
+        public static List<string> terminale = new List<string>();
+        public static Productii productii = new Productii();
+        static Table tabelaActiuni = new Table();
+        public static Table tabelaSalt = new Table();
+        public static Input intrare;
+        public const String ACCEPT = "acc";
+        static Action action;
+        public static Stiva stiva = new Stiva();
         static void Main(string[] args)
         {
-
-
             setup();
             //Map all productions to keys
+            intrare = new Input("a+a*a");
 
-            StringBuilder output = new StringBuilder(start); 
+            String state, symbol, actionString = null;
 
-            string[] values = { };
-            string value = "";
-            productii.TryGetValue("E", out values);
 
-            //Derivare extrem stanga 
-
-            //while no non-terminals found
-            for (int i = 0; i < output.Length && output.Length < 60; i++)
+            while (!intrare.isEmpty())
             {
-                string key = output[i].ToString();
-                if (productii.TryGetValue(key, out values))
+                //ia ultima stare din stiva
+                state = stiva.LatestState();
+                //ia primul simbol din sirul de intrare
+                symbol = intrare.getNextSymbol();
+                //ia actiunea rezultata
+                actionString = tabelaActiuni.getValue(Int32.Parse(state), symbol); //could throw error
+                action = ActionFactory.build(actionString);
+                if (action == null)
                 {
-                    value = getRandomValue(values);
-                   
-                    if (output.Length +value.Length-1> 60) //check case in which replacement length >1
-                    {
-                        break;
-                    }
-                    output = output.Replace(key, value, i, 1);
-                    i--;
-                    Console.WriteLine(output);
+                    break;
                 }
-
+                //ruleaza actiunea
+                action.run();
             }
 
-            Console.WriteLine(output);
-            Console.WriteLine(output.Length);
-
+            Console.WriteLine("acceptare");
 
         }
 
-        static string getRandomValue(string[] array)
+        static void setupActionTable()
         {
-            return array[rand.Next(0, array.Length)];
+            Dictionary<string, string> row = tabelaActiuni.getRow(0);
+            row.Add("a", "d5");
+            row.Add("(", "d4");
+            row = tabelaActiuni.getRow(1);
+            row.Add("+", "d6");
+            row.Add("$", ACCEPT);
+            row = tabelaActiuni.getRow(2);
+            row.Add("+", "r2");
+            row.Add("*", "d7");
+            row.Add(")", "r2");
+            row.Add("$", "r4");
+            row = tabelaActiuni.getRow(3);
+            row.Add("+", "r4");
+            row.Add("*", "r4");
+            row.Add(")", "r4");
+            row.Add("$", "r4");
+            row = tabelaActiuni.getRow(4);
+            row.Add("a", "d5");
+            row.Add("(", "d4");
+            row = tabelaActiuni.getRow(5);
+            row.Add("+", "r6");
+            row.Add("*", "r6");
+            row.Add(")", "r6");
+            row.Add("$", "r6");
+            row = tabelaActiuni.getRow(6);
+            row.Add("a", "d5");
+            row.Add("(", "d4");
+            row = tabelaActiuni.getRow(7);
+            row.Add("a", "d5");
+            row.Add("(", "d4");
+            row = tabelaActiuni.getRow(8);
+            row.Add("+", "d6");
+            row.Add(")", "d11");
+            row = tabelaActiuni.getRow(9);
+            row.Add("+", "r1");
+            row.Add("*", "d7");
+            row.Add(")", "r1");
+            row.Add("$", "r1");
+            row = tabelaActiuni.getRow(10);
+            row.Add("+", "r3");
+            row.Add("*", "r3");
+            row.Add(")", "r3");
+            row.Add("$", "r3");
+            row = tabelaActiuni.getRow(11);
+            row.Add("+", "r5");
+            row.Add("*", "r5");
+            row.Add(")", "r5");
+            row.Add("$", "r5");
         }
 
+        static void setupJumpTable()
+        {
+            Dictionary<string, string> row = tabelaSalt.getRow(0);
+            row.Add("E", "1");
+            row.Add("T", "2");
+            row.Add("F", "3");
+            row = tabelaSalt.getRow(4);
+            row.Add("E", "8");
+            row.Add("T", "2");
+            row.Add("F", "3");
+            row = tabelaSalt.getRow(6);
+            row.Add("T", "9");
+            row.Add("F", "3");
+            row = tabelaSalt.getRow(7);
+            row.Add("F", "10");
+        }
         static void setup()
         {
             StreamReader sr = new StreamReader(Path.GetFullPath(@"..\..\..\") + "setup.txt");
-            string contents = Regex.Replace(sr.ReadToEnd()," ","");
+            string contents = Regex.Replace(sr.ReadToEnd(), " ", "");
 
-            MatchCollection matches = getParts(contents,"T");
+            MatchCollection matches = getParts(contents, "T");
             foreach (Match match in matches)
             {
                 terminale.Add(match.ToString());
@@ -75,19 +134,20 @@ namespace First_App
                 neterminale.Add(match.ToString());
             }
 
-            string [] productions = getProductions(contents, "P");
+            string[] productions = getProductions(contents, "P");
             foreach (string production in productions)
             {
                 mapToProductions(production);
             }
 
-            start = Regex.Match(contents, @"S=(?<word>.+),?").Groups["word"].Value;
+            //  start = Regex.Match(contents, @"S=(?<word>.+),?").Groups["word"].Value;
 
-            Console.WriteLine("Rezultatul este:");
-           
+            setupActionTable();
+            setupJumpTable();
+
         }
 
-        static MatchCollection getParts(string contents,string part)
+        static MatchCollection getParts(string contents, string part)
         {
             string value = Regex.Match(contents, part + @"=\{(?<word>.+)},").Groups["word"].Value;
 
@@ -102,9 +162,9 @@ namespace First_App
 
         static void mapToProductions(string production)
         {
-            string[] parts=Regex.Split(production, "->");
+            string[] parts = Regex.Split(production, "->");
             string key = parts[0];
-            string[] values=Regex.Split(parts[1], @"[|]");
+            string[] values = Regex.Split(parts[1], @"[|]");
             //daca nu e neterminal nu avem ce mapa -> date gresite
             if (!neterminale.Contains(key))
             {
@@ -122,9 +182,11 @@ namespace First_App
                     Console.WriteLine($"{value} nu contine doar terminale sau neterminale! Va rog sa verificati lista de productii si sa corectati");
                     System.Environment.Exit(1);
                 }
+
+                productii.Add(key, value);
             }
 
-            productii.Add(key,values);
+
         }
 
     }
