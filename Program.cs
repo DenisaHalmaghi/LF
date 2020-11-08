@@ -22,7 +22,6 @@ namespace First_App
         static void Main(string[] args)
         {
             setup();
-            //Map all productions to keys
             intrare = new Input("a+a*a");
 
             String state, symbol, actionString = null;
@@ -139,8 +138,6 @@ namespace First_App
             {
                 mapToProductions(production);
             }
-
-            //  start = Regex.Match(contents, @"S=(?<word>.+),?").Groups["word"].Value;
 
             setupActionTable();
             setupJumpTable();
