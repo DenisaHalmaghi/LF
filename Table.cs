@@ -32,5 +32,31 @@ namespace First_App
             }
             return value;
         }
+
+        public void addValue(int row, string column, string value)
+        {
+
+            if (!tabel[row].ContainsKey(column))
+            {
+                tabel[row].Add(column, value);
+            }
+
+        }
+        public void toString()
+        {
+            //tabel.Length
+            for (int i = 0; i < tabel.Length; i++)
+            {
+                Dictionary<string, string> row = tabel[i];
+                foreach (KeyValuePair<string, string> pair in row)
+                {
+                    if (pair.Value != "")
+                    {
+                        Console.WriteLine($"({i},{pair.Key})={pair.Value}");
+                    }
+                }
+            }
+        }
+
     }
 }

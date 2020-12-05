@@ -24,7 +24,9 @@ namespace First_App
                         foreach (Tuple<string, string> productie in productii)
                         {
                             Articol articolNou = new Articol(productie);
-                            //if new articol not already in inchidere
+                            //AICI TREBE MODIFICAT - 
+                            //la comparatie ->
+                            //sa nu fie productia pusa deja - indiferent de poz punctului
                             if (!inchidere.Contains(articolNou))
                             {
                                 inchidere.Add(articolNou);
@@ -36,14 +38,9 @@ namespace First_App
             }
 
             return new Inchidere(inchidere);
-
-
-            //trebe sa avem un punct virtual
-            //T->.F
-            //nu schimbam productia
-            //retinem pozitia punctului
         }
 
+        protected Dictionary<Tuple<int, string>, string> perechi = new Dictionary<Tuple<int, string>, string>();
         public Inchidere genSalt(List<Articol> articole, string symbol)
         {
             Articol sarit;
@@ -81,21 +78,60 @@ namespace First_App
                 {
                     inc = genSalt(col[i].articole(), symbol);
                     //daca inchiderea nu mai e prezenta in colectie, bag-o
-                    if (inc.size() > 0 && !col.Contains(inc))
+                    if (inc.size() > 0)
                     {
-                        Console.WriteLine($"-------------{i}-{symbol}------------");
-                        Console.WriteLine($"I{col.Count}:");
-                        col.Add(inc);
-                        inc.toString();
-
+                        if (!col.Contains(inc))
+                        {
+                            perechi.Add(Tuple.Create(i, symbol), col.Count.ToString());
+                            Console.WriteLine($"-------------{i}-{symbol}------------");
+                            Console.WriteLine($"I{col.Count}:");
+                            col.Add(inc);
+                            inc.toString();
+                        }
+                        else
+                        {
+                            //ia aia care e bagata deja
+                            int index = col.FindIndex(x => x.Equals(inc));
+                            perechi.Add(Tuple.Create(i, symbol), index.ToString());
+                        }
                     }
                 }
             }
 
-
+            construiesteTabele(col);
         }
 
+        public void construiesteTabele(List<Inchidere> colectie)
+        {
+            for (int i = 0; i < colectie.Count; i++)
+            {
+                List<Articol> articole = colectie[i].articole();
+                for (int j = 0; j < articole.Count; j++)
+                {
+                    Articol articol = articole[j];
+                    string symbol = articol.getCurrentSymbol();
+                    string val;
+                    perechi.TryGetValue(Tuple.Create(i, symbol), out val);
+                    if (symbol == Program.DEPASESTE)
+                    {
+                        //to be implemented
+                    }
+                    else if (articol.isTerminal())
+                    {
+                        Program.tabelaActiuni.addValue(i, symbol, $"d{val}");
+                    }
+                    else
+                    {
+                        //Console.WriteLine(symbol);
+                        Program.tabelaSalt.addValue(i, symbol, val);
+                    }
+                }
+            }
+            Console.WriteLine("\ntabela de salt --------------------------------\n");
+            Program.tabelaSalt.toString();
+            Console.WriteLine("\ntabela de actiuni --------------------------------\n");
+            Program.tabelaActiuni.toString();
 
-
+        }
     }
 }
