@@ -21,7 +21,8 @@ namespace First_App
 
         public void Pop(string value)
         {
-            int index = pairs.FindIndex(pair => pair.Item1 == value);
+
+            int index = pairs.FindLastIndex(pair => pair.Item1 == value);
             pairs.RemoveRange(index, pairs.Count - index);
         }
 

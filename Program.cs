@@ -12,39 +12,58 @@ namespace First_App
         static Random rand = new Random();
         public static List<string> neterminale = new List<string>();
         public static List<string> terminale = new List<string>();
+        public static List<string> simboluri = new List<string>();
         public static Productii productii = new Productii();
         static Table tabelaActiuni = new Table();
         public static Table tabelaSalt = new Table();
         public static Input intrare;
         public const String ACCEPT = "acc";
         static Action action;
+        public const String DEPASESTE = "depasaste";
         public static Stiva stiva = new Stiva();
         static void Main(string[] args)
         {
             setup();
-            intrare = new Input("a+a*a");
-
-            String state, symbol, actionString = null;
-
-
-            while (!intrare.isEmpty())
+            foreach (string neterminal in Program.neterminale)
             {
-                //ia ultima stare din stiva
-                state = stiva.LatestState();
-                //ia primul simbol din sirul de intrare
-                symbol = intrare.getNextSymbol();
-                //ia actiunea rezultata
-                actionString = tabelaActiuni.getValue(Int32.Parse(state), symbol); //could throw error
-                action = ActionFactory.build(actionString);
-                if (action == null)
-                {
-                    break;
-                }
-                //ruleaza actiunea
-                action.run();
+                simboluri.Add(neterminal);
             }
+            simboluri.Add("(");
+            simboluri.Add(")");
+            foreach (string terminal in Program.terminale)
+            {
+                simboluri.Add(terminal);
 
-            Console.WriteLine("acceptare");
+            }
+            String state, symbol, actionString = null;
+            Helper h = new Helper();
+            h.colectie();
+            //init colectie.add inchidere init
+            //for each inchidere
+            //fa salturi cu toate simbolurile
+
+            //h.genSalt(inchidere);
+            //h.afis(inchidere);
+
+
+            /* while (!intrare.isEmpty())
+             {
+                 //ia ultima stare din stiva
+                 state = stiva.LatestState();
+                 //ia primul simbol din sirul de intrare
+                 symbol = intrare.getNextSymbol();
+                 //ia actiunea rezultata
+                 actionString = tabelaActiuni.getValue(Int32.Parse(state), symbol); //could throw error
+                 action = ActionFactory.build(actionString);
+                 if (action == null)
+                 {
+                     break;
+                 }
+                 //ruleaza actiunea
+                 action.run();
+             }
+
+             Console.WriteLine("acceptare");*/
 
         }
 
@@ -141,6 +160,8 @@ namespace First_App
 
             setupActionTable();
             setupJumpTable();
+            intrare = new Input(Regex.Match(contents, @"I=(?<word>.+)").Groups["word"].Value);
+            //  string inp = Regex.Match(contents, @"I=(?<word>.+)").Groups["word"].Value;
 
         }
 

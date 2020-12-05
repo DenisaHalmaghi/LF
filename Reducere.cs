@@ -15,8 +15,8 @@ namespace First_App
         public override void run()
         {
 
-            String right = productie.Item1;
             //scoate din stiva vechile stari si simboluri
+            String right = productie.Item1;
             stiva.Pop(productie.Item2.Substring(0, 1));
             //ia din tabela de salt starea urmatoare
             String state = stiva.LatestState();

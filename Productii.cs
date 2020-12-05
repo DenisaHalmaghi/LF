@@ -17,6 +17,20 @@ namespace First_App
             return productii[productie];
         }
 
+        public List<Tuple<string, string>> get(string derivat)
+        {
+            List<Tuple<string, string>> cautate = new List<Tuple<string, string>>();
+            foreach (Tuple<string, string> productie in productii)
+            {
+                if (productie.Item1 == derivat)
+                {
+                    cautate.Add(productie);
+                }
+            }
+
+            return cautate;
+        }
+
 
     }
 
