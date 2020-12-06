@@ -35,6 +35,11 @@ namespace First_App
             return Char.ToString(productie.Item2[punct]);
         }
 
+        public string getPrevSymbol()
+        {
+            return Char.ToString(productie.Item2[punct - 1]);
+        }
+
         public void toString()
         {
             Console.WriteLine($"{productie.Item1}->{productie.Item2.Insert(punct, ".")}");

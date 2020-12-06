@@ -15,8 +15,10 @@ namespace First_App
         public static List<string> simboluri = new List<string>();
         public static Productii productii = new Productii();
         public static Table tabelaActiuni = new Table();
+        public static Dictionary<string, List<string>> urmatori = new Dictionary<string, List<string>>();
         public static Table tabelaSalt = new Table();
         public static Input intrare;
+        public static string START = "E";
         public const String ACCEPT = "acc";
         static Action action;
         public const String DEPASESTE = "depasaste";
@@ -38,28 +40,35 @@ namespace First_App
             }
             String state, symbol, actionString = null;
             Helper h = new Helper();
+            List<string> primi = new List<string>();
+            // h.prim("E", primi);
+
+            /*foreach (var item in primi)
+            {
+                Console.WriteLine(item);
+            }*/
             h.colectie();
 
 
 
-            /* while (!intrare.isEmpty())
-             {
-                 //ia ultima stare din stiva
-                 state = stiva.LatestState();
-                 //ia primul simbol din sirul de intrare
-                 symbol = intrare.getNextSymbol();
-                 //ia actiunea rezultata
-                 actionString = tabelaActiuni.getValue(Int32.Parse(state), symbol); //could throw error
-                 action = ActionFactory.build(actionString);
-                 if (action == null)
-                 {
-                     break;
-                 }
-                 //ruleaza actiunea
-                 action.run();
-             }
+            while (!intrare.isEmpty())
+            {
+                //ia ultima stare din stiva
+                state = stiva.LatestState();
+                //ia primul simbol din sirul de intrare
+                symbol = intrare.getNextSymbol();
+                //ia actiunea rezultata
+                actionString = tabelaActiuni.getValue(Int32.Parse(state), symbol); //could throw error
+                action = ActionFactory.build(actionString);
+                if (action == null)
+                {
+                    break;
+                }
+                //ruleaza actiunea
+                action.run();
+            }
 
-             Console.WriteLine("acceptare");*/
+            Console.WriteLine("----------------acceptare-----------------------");
 
         }
 
@@ -156,9 +165,17 @@ namespace First_App
 
             /*setupActionTable();
             setupJumpTable();*/
+            setupUrmatori();
             intrare = new Input(Regex.Match(contents, @"I=(?<word>.+)").Groups["word"].Value);
             //  string inp = Regex.Match(contents, @"I=(?<word>.+)").Groups["word"].Value;
 
+        }
+
+        static void setupUrmatori()
+        {
+            urmatori.Add("E", new List<string>() { "+", ")", "$" });
+            urmatori.Add("T", new List<string>() { "+", ")", "$", "*" });
+            urmatori.Add("F", new List<string>() { "+", ")", "$", "*" });
         }
 
         static MatchCollection getParts(string contents, string part)

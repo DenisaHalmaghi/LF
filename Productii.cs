@@ -31,6 +31,11 @@ namespace First_App
             return cautate;
         }
 
+        public int getIndex(Tuple<string, string> cautat)
+        {
+            return productii.FindIndex(productie => productie.Item1 == cautat.Item1 && productie.Item2 == cautat.Item2);
+        }
+
 
     }
 

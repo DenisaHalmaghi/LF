@@ -6,6 +6,8 @@ namespace First_App
 {
     class Helper
     {
+        protected Dictionary<Tuple<int, string>, string> perechi = new Dictionary<Tuple<int, string>, string>();
+
         public Inchidere inchidere(List<Articol> articole)
         {
             //might have to clone it!!!!
@@ -40,7 +42,7 @@ namespace First_App
             return new Inchidere(inchidere);
         }
 
-        protected Dictionary<Tuple<int, string>, string> perechi = new Dictionary<Tuple<int, string>, string>();
+
         public Inchidere genSalt(List<Articol> articole, string symbol)
         {
             Articol sarit;
@@ -62,7 +64,6 @@ namespace First_App
             List<Articol> articole = new List<Articol>();
             articole.Add(new Articol(Tuple.Create("E", "E"), 0));
             Inchidere inchidere0 = inchidere(articole);
-
             Inchidere inc;
 
             Console.WriteLine("inchidere initialaaa");
@@ -112,9 +113,27 @@ namespace First_App
                     string symbol = articol.getCurrentSymbol();
                     string val;
                     perechi.TryGetValue(Tuple.Create(i, symbol), out val);
-                    if (symbol == Program.DEPASESTE)
+                    if (symbol == Program.DEPASESTE) //adica e punctul la final
                     {
                         //to be implemented
+                        symbol = articol.getPrevSymbol();
+                        if (symbol == Program.START)
+                        {
+                            Program.tabelaActiuni.addValue(i, "$", Program.ACCEPT);
+                        }
+                        else
+                        {
+                            string leftSymbol = articol.getProduction().Item1;
+                            List<string> urm;
+                            int index = Program.productii.getIndex(articol.getProduction());
+                            Program.urmatori.TryGetValue(leftSymbol, out urm);
+                            foreach (var urmator in urm)
+                            {
+                                Program.tabelaActiuni.addValue(i, urmator, $"r{index + 1}");
+                                Console.WriteLine(urmator);
+                            }
+                        }
+
                     }
                     else if (articol.isTerminal())
                     {
@@ -133,5 +152,39 @@ namespace First_App
             Program.tabelaActiuni.toString();
 
         }
+
+        public string prim(string symbol, List<string> primi)
+        {
+            //daca e terminal
+            if (!Program.neterminale.Contains(symbol))
+            {
+                return symbol;
+            }
+
+            foreach (var productie in Program.productii.get(symbol))
+            {
+                string primul = Char.ToString(productie.Item2[0]);
+                if (primul != symbol)
+                {
+                    string p = prim(primul, primi);
+                    if (p != "")
+                    {
+                        primi.Add(prim(primul, primi));
+                    }
+                }
+            }
+            return "";
+            //daca nu prim de symbol e prim de primul simbol din partea dreapta a productiei
+        }
+
+        /* public string urmator(string symbol, List<string> primi)
+         {
+             //daca e simbolul de start baga dolaru
+             //daca e la final (nu mai urmeaza nik dupa el=> e egal cu urm (ce-i in stanga productiei)
+             //daca nu 
+             //daca urmatorul simbol e terminal atunci ala ramane
+             //daca urmatorul simbol e neterminal atunci avem prim de el
+             //daca prim are un dolar bagat
+         }*/
     }
 }
