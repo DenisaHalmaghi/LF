@@ -130,7 +130,6 @@ namespace First_App
                             foreach (var urmator in urm)
                             {
                                 Program.tabelaActiuni.addValue(i, urmator, $"r{index + 1}");
-                                Console.WriteLine(urmator);
                             }
                         }
 

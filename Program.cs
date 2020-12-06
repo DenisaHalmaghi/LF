@@ -18,15 +18,13 @@ namespace First_App
         public static Dictionary<string, List<string>> urmatori = new Dictionary<string, List<string>>();
         public static Table tabelaSalt = new Table();
         public static Input intrare;
-        public static string START = "E";
+        public static string START;
         public const String ACCEPT = "acc";
         static Action action;
         public const String DEPASESTE = "depasaste";
         public static Stiva stiva = new Stiva();
         static void Main(string[] args)
         {
-            terminale.Add("(");
-            terminale.Add(")");
             setup();
             foreach (string neterminal in Program.neterminale)
             {
@@ -146,6 +144,8 @@ namespace First_App
             string contents = Regex.Replace(sr.ReadToEnd(), " ", "");
 
             MatchCollection matches = getParts(contents, "T");
+            terminale.Add("(");
+            terminale.Add(")");
             foreach (Match match in matches)
             {
                 terminale.Add(match.ToString());
@@ -163,6 +163,7 @@ namespace First_App
                 mapToProductions(production);
             }
 
+            START = Regex.Match(contents, @"S=(?<word>.+),?").Groups["word"].Value;
             /*setupActionTable();
             setupJumpTable();*/
             setupUrmatori();

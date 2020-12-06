@@ -1,4 +1,5 @@
 ﻿T={a,+ ,* },
 N={E,T,F},
 P={E -> E+T|T, T-> T*F | F, F - > (E)| a},
-I=(a++a)*a
+I=(a+a)*a
+S=E
